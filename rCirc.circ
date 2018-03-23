@@ -1,0 +1,15 @@
+This is a netlist		$must have a title line
+.options post acct opts node	$HPSICE options
+
+r1	1	2	500	$resistor connecting node 1 and 2
+r2  2   0   1600 $resistor
+r3  2   3   400
+r4  3   0   240
+r5  3   4   200
+r6  5   0   300
+v1  1   0   dc  5   $voltage source
+v2  4   5   dc  10
+$v4	4	0	dc 0 ac 0 0 pulse 0 1 0 .15 .15 .4 2	$voltage source
+$vdata	data	0	sin(1.0 1.0 1.0 0.0 1.0)		$voltage source
+$v6	6	0	exp(1 0.1 .02 .6 .2)			$voltage source
+.end				$Must have an end

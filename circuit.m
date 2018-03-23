@@ -2,6 +2,7 @@ classdef circuit < handle
     
     properties
         A = []; % Modified nodal analysis matrix
+        R = []; % Gaussian-Jordan reduced matrix of A
         E = containers.Map('KeyType','char','ValueType','any'); % Element to terminal mappings
         V = mat; % Containers for all node's voltages
     end
