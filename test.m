@@ -7,4 +7,4 @@ spice_begin
 spice_end
 
 v1 = cir.v(1,0);
-v21 = cir.v(2,0);
+v21 = cir.v(2,1);
