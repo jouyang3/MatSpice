@@ -1,4 +1,4 @@
-function solve(cir)
+function dc(cir)
     cir.A = rref(cir.A);
     N = length(cir.V.A);
     for ii = 1:N

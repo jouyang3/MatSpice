@@ -3,8 +3,6 @@ SPICE for Matlab
 
 
 ## Simple resistive divider.
-
-### Spice listing
 ```spice
 This is a netlist		$must have a title line
 
@@ -19,22 +17,19 @@ v2  4   5   dc  10
 .end				$Must have an end
 ```
 
-### Matlab code
 ```matlab
 spice_begin
 %     global logger
 %     logger.setLogLevel(log4m.INFO);
 %     logger.setCommandWindowLevel(logger.INFO);
     cir = load('rCirc.circ');
-    solve(cir);
+    dc(cir);
 spice_end
 
 v1 = cir.v(1,0);
-v21 = cir.v(2,1);
+v21 = cir.v(2,0);
 ```
-### Results
 
-#### Modified Nodal Analysis matrix to solve:
 ```matlab
 >> cir.A
 
@@ -49,7 +44,6 @@ ans =
          0         0         0    1.0000   -1.0000         0         0   10.0000
 ```
 
-#### MNA solution matrix:
 ```matlab
 >> cir.R
 
@@ -64,7 +58,6 @@ ans =
          0         0         0         0         0         0    1.0000   -0.0133
 ```
 
-#### Sample node voltages:
 ```matlab
 >> v1
 

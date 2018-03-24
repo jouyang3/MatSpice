@@ -1,9 +1,11 @@
+
+clear;
 spice_begin
 %     global logger
 %     logger.setLogLevel(log4m.INFO);
 %     logger.setCommandWindowLevel(logger.INFO);
     cir = load('rCirc.circ');
-    solve(cir);
+    dc(cir);
 spice_end
 
 v1 = cir.v(1,0);
