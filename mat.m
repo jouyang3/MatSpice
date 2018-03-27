@@ -9,6 +9,14 @@ classdef mat < handle
     end
     
     methods
+        
+        function obj = mat(varargin)
+            defaults = {0,0};
+            defaults(1:nargin) = varargin;
+            obj.m = defaults{1};
+            obj.n = defaults{2};
+            obj.A = zeros(obj.m,obj.n);
+        end
         function val = get(this,m,n)
             this.expand(m,n);
             val = this.A(m,n);
@@ -28,17 +36,19 @@ classdef mat < handle
             
             if m>a
                 this.A = [this.A;zeros(m-a,b)];
+                this.m = m;
                 if n>b
                     this.A = [this.A,zeros(m,n-b)];
+                    this.n = n;
                 end
             elseif n>b
                 this.A = [this.A,zeros(a,n-b)];
+                this.n = n;
                 if m>a
                     this.A = [this.A;zeros(m-a,n)];
+                    this.m = m;
                 end
             end
-            
-            this.m = m; this.n = n;
         end
         
         function obj = horcat(this,other)

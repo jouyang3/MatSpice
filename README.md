@@ -2,7 +2,7 @@
 SPICE for Matlab
 
 
-## Simple resistive divider.
+## Simple resistive divider. File: test.cir
 ```spice
 This is a netlist		$must have a title line
 
@@ -22,12 +22,12 @@ spice_begin
 %     global logger
 %     logger.setLogLevel(log4m.INFO);
 %     logger.setCommandWindowLevel(logger.INFO);
-    cir = load('rCirc.circ');
+    cir = load('test.cir');
     dc(cir);
 spice_end
 
-v1 = cir.v(1,0);
-v21 = cir.v(2,0);
+v1 = cir.vdc(1,0);
+v21 = cir.vdc(2,0);
 ```
 
 ```matlab
@@ -45,7 +45,7 @@ ans =
 ```
 
 ```matlab
->> cir.R
+>> cir.DC
 
 ans =
 

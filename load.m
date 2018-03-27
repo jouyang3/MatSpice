@@ -8,16 +8,7 @@ function cir = load(filename)
     
     % file handle
     fid = fopen(filename,'r');
-    
-    % Modified Nodal Analysis: http://qucs.sourceforge.net/tech/node14.html
-    G = mat; % passive elements
-    B = mat; % independent voltage elements
-    
-    % definition of C and D subject to change for dependent voltage
-    % sources.
-    C = mat; % transpose of indepdent voltage elements
-    D = mat; % zero matrix
-    
+
     z = mat; % constraint vector.
     
     %TODO: For all elements, need to map node names to numbers. As of now,
@@ -39,27 +30,28 @@ function cir = load(filename)
         switch type
             case 'R' % Resistor
                 logger.info(fname,'Resistor');
-                buildR(line,G,z,cir);
+                cir.register(res(line));
             case 'C' % Capacitor
                 logger.info(fname,'Capacitor');
             case 'L' % Inductor
                 logger.info(fname,'Inductor');
             case 'I' % Current Source
                 logger.info(fname,'Current Source');
+                %buildI(line,z,cir);
             case 'V' % Voltage Source
                 logger.info(fname,'Voltage Source');
-                buildV(line,B,C,z,cir);
+                cir.register(vsrc(line));
             otherwise
                 % do nothing
         end
     end
     
-    % assume no dependent sources yet.
-    D = mat; D.set(C.m,B.n,0);
+    cir.conform();
     
-    G.horcat(B).vercat(C.horcat(D)).horcat(z);
+    % assume no dependent sources yet.
+    cir.D = mat; cir.D.set(cir.C.m,cir.B.n,0);
+    
+    cir.A = [cir.G.A cir.B.A cir.I.A; cir.C.A, cir.D.A cir.V.A];
     
     fclose(fid);
-    
-    cir.A = G.A;
 end
