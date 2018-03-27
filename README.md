@@ -27,7 +27,7 @@ spice_begin
 spice_end
 
 v1 = cir.vdc(1,0);
-v21 = cir.vdc(2,0);
+v21 = cir.vdc(2,1);
 ```
 
 ```matlab
