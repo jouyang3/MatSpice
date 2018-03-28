@@ -115,6 +115,7 @@ classdef circuit < handle
         end
         
         function val = idc(this,s)
+            fname = 'idc';
             %% i: query element current
             val = 0;
             global logger;
@@ -156,6 +157,15 @@ classdef circuit < handle
                     ele = this.Vsrc(s);
                     n = ele.id;
                     val = this.DC(this.G.m+n,end);
+                case 'I'
+                    if ~isKey(this.Isrc,s)
+                        es = sprintf('No such current source exists: %s',s);
+                        logger.error(fname,es);
+                        val = -1;
+                        return;
+                    end
+                    ele = this.Isrc(s);
+                    val = ele.val;
                 otherwise
                     es = sprintf('Element type unknown: %s',type);
                     logger.error(fname,es);

@@ -38,6 +38,9 @@ classdef vsrc < element
             this.val = V;
             this.id = id;
             
+            s = sprintf('%s (I%d) = %f',this.name,this.id,V);
+            logger.info(fname,s);
+            
             % Currently, map does not pass by reference...
             cir.Vsrc(this.name) = this;
 
@@ -48,24 +51,22 @@ classdef vsrc < element
             % C: For i x j matrix, the ith direction represents ith voltage source.
             % B = C' for circuit without dependent voltage sources.
             
-            newVs = cir.B.n+1;
-            newV = cir.V.m+1;
             
             % Best to count the number of pins, voltage sources, current sources
             % before analyzing takes place
             
             if a ~= 0
-                cir.B.set(a,newVs,1);
+                cir.B.set(a,this.id,1);
                 % assume no dependent voltage source for now so that B = C'
-                cir.C.set(newVs,a,1);
-                cir.V.set(newV,1,V);
+                cir.C.set(this.id,a,1);
+                cir.V.set(this.id,1,V);
             end
             
             if b ~= 0
-                cir.B.set(b,newVs,-1);
+                cir.B.set(b,this.id,-1);
                 % assume no dependent voltage source for now so that B = C'
-                cir.C.set(newVs,b,-1);
-                cir.V.set(newV,1,V);
+                cir.C.set(this.id,b,-1);
+                cir.V.set(this.id,1,V);
             end
         end
     end

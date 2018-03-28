@@ -2,7 +2,7 @@
 SPICE for Matlab
 
 
-## Simple resistive divider. File: rvCir.cir
+## Simple resistive divider. Netlist File: rvCir.cir
 ```spice
 This is a netlist		$must have a title line
 
@@ -14,7 +14,6 @@ v1  in   0   dc  6   $voltage source
 ```
 
 ```matlab
-
 clear;
 spice_begin
      global logger
@@ -101,4 +100,109 @@ ans =
          0    1.0000         0         0    1.2000
          0         0    1.0000         0    1.2000
          0         0         0    1.0000   -0.0048
+```
+
+## Circuit with current source. Netlist File: rviCir.cir
+```spice
+This is a netlist		$must have a title line
+
+r1	1	2	1000	$resistor connecting node 1 and 2
+r2  2   3   500 $resistor
+r3  2   0   250
+i1  3   0   dc  0.001
+v1  1   0   dc  6   $voltage source
+.end				$Must have an end
+```
+
+```matlab
+
+clear;
+spice_begin
+     global logger
+%     logger.setLogLevel(log4m.INFO);
+%     logger.setCommandWindowLevel(logger.INFO);
+    cir = load('rviCir.cir');
+    dc(cir);
+spice_end
+
+A = cir.A
+
+DC = cir.DC
+
+v1 = cir.vdc(1,0)
+
+v2 = cir.vdc(2,0)
+
+v3 = cir.vdc(3,0)
+
+% charge flowing into the voltage source from a to b.
+i1 = cir.idc('i1')
+
+% charge flowing into the floating resistor from a to b (node OUT to ground).
+ir1 = cir.idc('R1')
+
+% charge flowing into the floating resistor from a to b (node OUT to ground).
+ir2 = cir.idc('r2')
+
+% charge flowing into the resistor 3 from a to b (node OUT to ground).
+ir3 = cir.idc('r3')
+
+iv1 = cir.idc('v1')
+```
+
+```matlab
+A =
+
+    0.0010   -0.0010         0    1.0000         0
+   -0.0010    0.0070   -0.0020         0         0
+         0   -0.0020    0.0020         0   -0.0010
+    1.0000         0         0         0    6.0000
+
+
+DC =
+
+    1.0000         0         0         0    6.0000
+         0    1.0000         0         0    1.0000
+         0         0    1.0000         0    0.5000
+         0         0         0    1.0000   -0.0050
+
+
+v1 =
+
+     6
+
+
+v2 =
+
+    1.0000
+
+
+v3 =
+
+    0.5000
+
+
+i1 =
+
+   1.0000e-03
+
+
+ir1 =
+
+    0.0050
+
+
+ir2 =
+
+   1.0000e-03
+
+
+ir3 =
+
+    0.0040
+
+
+iv1 =
+
+   -0.0050
 ```

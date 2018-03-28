@@ -1,12 +1,12 @@
-classdef res < element
+classdef isrc < element
     
     methods
-        function obj = res(line)
+        function obj = isrc(line)
             obj@element(line)
         end
         
         function attach(this,cir,id)
-            fname = 'R.attach';
+            fname = 'I.attach';
             global logger
             % logger.info(fname,this.line);
             ii = 1; L = length(this.line);
@@ -29,40 +29,35 @@ classdef res < element
             
             a = cir.nodes.get(as);    
             b = cir.nodes.get(bs);
-            R = str2num(args{4});
+            I = str2num(args{5});
             
             this.name = args{1};
             this.pins = [a, b];
-            this.val = R;
+            this.val = I;
             this.id = id;
             
-            s = sprintf('%s (I%d) = %f',this.name,this.id,R);
+            s = sprintf('%s (I%d) = %f',this.name,this.id,I);
             logger.info(fname,s);
             
             % Currently, map does not pass by reference...
-            cir.Res(this.name) = this;
+            cir.Isrc(this.name) = this;
 
-            % Emulating current flowing out of nodes
-            % every increase in R in node a increase voltage of node a and
-            % increase current flowing out of it by 1/R. And every increase of R
-            % reduces voltage of node b and reduces voltage flowing out of node a
-            % by 1/R (or increase by -1/R).
-            %
-            % Ignoring ground node.
+            % every volt increase in voltage source increase current flowing out of
+            % node a by 1A (a is the + of voltage source).
+            
+            % B: For i x j matrix, the jth direction represents jth voltage source.
+            % C: For i x j matrix, the ith direction represents ith voltage source.
+            % B = C' for circuit without dependent voltage sources.
+            
+            % Best to count the number of pins, voltage sources, current sources
+            % before analyzing takes place
             
             if a ~= 0
-                cir.G.add(a,a,1/R);
-                
+                cir.I.set(a,1,-I);
             end
             
             if b ~= 0
-                cir.G.add(b,b,1/R);
-                
-            end
-            
-            if a ~= 0 && b ~= 0
-                cir.G.add(a,b,-1/R);
-                cir.G.add(b,a,-1/R);
+                cir.V.set(b,1,I);
             end
         end
     end

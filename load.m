@@ -39,7 +39,7 @@ function cir = load(filename)
                 logger.info(fname,'Inductor');
             case 'I' % Current Source
                 logger.info(fname,'Current Source');
-                %buildI(line,z,cir);
+                cir.register(isrc(line),vid);
             case 'V' % Voltage Source
                 logger.info(fname,'Voltage Source');
                 vid = vid+1;
