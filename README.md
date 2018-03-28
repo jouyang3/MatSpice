@@ -2,32 +2,83 @@
 SPICE for Matlab
 
 
-## Simple resistive divider. File: test.cir
+## Simple resistive divider. File: rvCir.cir
 ```spice
 This is a netlist		$must have a title line
 
-r1	1	2	500	$resistor connecting node 1 and 2
-r2  2   0   1600 $resistor
-r3  2   3   400
-r4  3   0   240
-r5  3   4   200
-r6  5   0   300
-v1  1   0   dc  5   $voltage source
-v2  4   5   dc  10
+r1	in	out	1000	$resistor connecting node 1 and 2
+r2  out   3   500 $resistor
+r3  out   0   250
+v1  in   0   dc  6   $voltage source
 .end				$Must have an end
 ```
 
 ```matlab
+
+clear;
 spice_begin
-%     global logger
+     global logger
 %     logger.setLogLevel(log4m.INFO);
 %     logger.setCommandWindowLevel(logger.INFO);
-    cir = load('test.cir');
+    cir = load('rvCir.cir');
     dc(cir);
 spice_end
 
-v1 = cir.vdc(1,0);
-v21 = cir.vdc(2,1);
+voutin = cir.vdc('out','in')
+
+vout3 = cir.vdc('out',3)
+
+vout = cir.vdc('out',0)
+
+% charge flowing into the voltage source from a to b.
+iv1 = cir.idc('v1')
+
+% charge flowing into the floating resistor from a to b (node OUT to ground).
+ir1 = cir.idc('R1')
+
+% charge flowing into the floating resistor from a to b (node OUT to ground).
+ir2 = cir.idc('r2')
+
+% charge flowing into the resistor 3 from a to b (node OUT to ground).
+ir3 = cir.idc('r3')
+```
+
+```matlab
+>> test
+
+voutin =
+
+   -4.8000
+
+
+vout3 =
+
+     0
+
+
+vout =
+
+    1.2000
+
+
+iv1 =
+
+   -0.0048
+
+
+ir1 =
+
+    0.0048
+
+
+ir2 =
+
+     0
+
+
+ir3 =
+
+    0.0048
 ```
 
 ```matlab
@@ -35,13 +86,10 @@ v21 = cir.vdc(2,1);
 
 ans =
 
-    0.0020   -0.0020         0         0         0    1.0000         0         0
-   -0.0020    0.0051   -0.0025         0         0         0         0         0
-         0   -0.0025    0.0117   -0.0050         0         0         0         0
-         0         0   -0.0050    0.0050         0         0    1.0000         0
-         0         0         0         0    0.0033         0   -1.0000         0
-    1.0000         0         0         0         0         0         0    5.0000
-         0         0         0    1.0000   -1.0000         0         0   10.0000
+    0.0010   -0.0010         0    1.0000         0
+   -0.0010    0.0070   -0.0020         0         0
+         0   -0.0020    0.0020         0         0
+    1.0000         0         0         0    6.0000
 ```
 
 ```matlab
@@ -49,27 +97,8 @@ ans =
 
 ans =
 
-    1.0000         0         0         0         0         0         0    5.0000
-         0    1.0000         0         0         0         0         0    3.5808
-         0         0    1.0000         0         0         0         0    3.3406
-         0         0         0    1.0000         0         0         0    6.0044
-         0         0         0         0    1.0000         0         0   -3.9956
-         0         0         0         0         0    1.0000         0   -0.0028
-         0         0         0         0         0         0    1.0000   -0.0133
-```
-
-```matlab
->> v1
-
-v1 =
-
-     5
-```
-
-```matlab
->> v21
-
-v21 =
-
-   -1.4192
+    1.0000         0         0         0    6.0000
+         0    1.0000         0         0    1.2000
+         0         0    1.0000         0    1.2000
+         0         0         0    1.0000   -0.0048
 ```

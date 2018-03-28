@@ -14,6 +14,7 @@ function cir = load(filename)
     %TODO: For all elements, need to map node names to numbers. As of now,
     %it is marking nodes with numbers. The algorithm breaks if nodes are
     %not continuous integers from 1:n.
+    rid = 0; vid = 0; lid = 0; cid = 0;
     while 1
         line = upper(fgetl(fid));
         if isempty(line)
@@ -30,7 +31,8 @@ function cir = load(filename)
         switch type
             case 'R' % Resistor
                 logger.info(fname,'Resistor');
-                cir.register(res(line));
+                rid = rid+1;
+                cir.register(res(line),rid);
             case 'C' % Capacitor
                 logger.info(fname,'Capacitor');
             case 'L' % Inductor
@@ -40,7 +42,8 @@ function cir = load(filename)
                 %buildI(line,z,cir);
             case 'V' % Voltage Source
                 logger.info(fname,'Voltage Source');
-                cir.register(vsrc(line));
+                vid = vid+1;
+                cir.register(vsrc(line),vid);
             otherwise
                 % do nothing
         end

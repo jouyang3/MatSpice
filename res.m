@@ -5,7 +5,7 @@ classdef res < element
             obj@element(line)
         end
         
-        function attach(this,cir)
+        function attach(this,cir,id)
             fname = 'R.attach';
             global logger
             % logger.info(fname,this.line);
@@ -24,14 +24,21 @@ classdef res < element
                 logger.info(fname,tok);
             end
             
-            a = int8(str2num(args{2}));
-            b = int8(str2num(args{3}));
+            as = args{2};
+            bs = args{3};
+            
+            a = cir.nodes.get(as);    
+            b = cir.nodes.get(bs);
             R = str2num(args{4});
             
-            cir.Ele(args{1}) = [a, b];
+            this.name = args{1};
             this.pins = [a, b];
             this.val = R;
-            cir.Res = [cir.Res this];
+            this.id = id;
+            
+            % Currently, map does not pass by reference...
+            cir.Res(this.name) = this;
+
             % Emulating current flowing out of nodes
             % every increase in R in node a increase voltage of node a and
             % increase current flowing out of it by 1/R. And every increase of R

@@ -14,12 +14,13 @@ classdef circuit < handle
         I = mat; % KCL constraint.
         V = mat; % KVL constraint.
         
-        Vsrc = []; % Containers for voltage sources
-        Isrc = []; % Containers for current sources
-        Res = []; % Containers for resistors
-        Cap = []; % Containers for capacitors
-        Ind = []; % Containers for inductors
-        Ele = containers.Map('KeyType','char','ValueType','any'); % Element to terminal mappings
+        Vsrc = containers.Map('KeyType','char','ValueType','any'); % Containers for voltage sources
+        Isrc = containers.Map('KeyType','char','ValueType','any'); % Containers for current sources
+        Res = containers.Map('KeyType','char','ValueType','any'); % Containers for resistors
+        Cap = containers.Map('KeyType','char','ValueType','any'); % Containers for capacitors
+        Ind = containers.Map('KeyType','char','ValueType','any'); % Containers for inductors
+        % Ele = containers.Map('KeyType','char','ValueType','any'); % Element to terminal mappings
+        nodes = nodemap;
     end
     
     methods
@@ -38,16 +39,16 @@ classdef circuit < handle
             obj.I = mat; % KCL constraint vector.
             obj.V = mat; % KVL constraint vector.
             
-            obj.Vsrc = []; % Containers for voltage sources
-            obj.Isrc = []; % Containers for current sources
-            obj.Res = []; % Containers for resistors
-            obj.Cap = []; % Containers for capacitors
-            obj.Ind = []; % Containers for inductors
-            obj.Ele = containers.Map('KeyType','char','ValueType','any'); % Element to terminal mappings
+            Vsrc = containers.Map('KeyType','char','ValueType','any'); % Containers for voltage sources
+            Isrc = containers.Map('KeyType','char','ValueType','any'); % Containers for current sources
+            Res = containers.Map('KeyType','char','ValueType','any'); % Containers for resistors
+            Cap = containers.Map('KeyType','char','ValueType','any'); % Containers for capacitors
+            Ind = containers.Map('KeyType','char','ValueType','any'); % Containers for inductors
+            obj.nodes = nodemap;
         end
         
-        function register(this,element)
-            element.attach(this);
+        function register(this,element,id)
+            element.attach(this,id);
         end
         
         function conform(this) %fill zeros for the MNA matrix
@@ -75,6 +76,32 @@ classdef circuit < handle
                 return;
             end
             
+            % Check input arguments are string or number
+            
+            if isa(a,'char')
+                a = upper(a);
+                if this.nodes.isKey(a)
+                    a = this.nodes.get(a);
+                else
+                    es = sprintf('No such node exists: %s',a);
+                    logger.error(fname,es);
+                    val = -1;
+                    return;
+                end
+            end
+            
+            if isa(b,'char')
+                b = upper(b);
+                if this.nodes.isKey(b)
+                    b = this.nodes.get(b);
+                else
+                    es = sprintf('No such node exists: %s',a);
+                    logger.error(fname,es);
+                    val = -1;
+                    return;
+                end
+            end 
+            
             va = 0; vb = 0;
             if a ~= 0
                 va = this.DC(a,end);
@@ -101,6 +128,39 @@ classdef circuit < handle
                 logger.error(fname,'No DC solution');
                 val = -1;
                 return;
+            end
+            
+            s = upper(s);
+            type = s(1);
+            
+            switch(type)
+                case 'R'
+                    if ~isKey(this.Res,s)
+                        es = sprintf('No such resistor exists: %s',s);
+                        logger.error(fname,es);
+                        val = -1;
+                        return;
+                    end
+                    ele = this.Res(s);
+                    va = this.vdc(ele.pins(1),0);
+                    vb = this.vdc(ele.pins(2),0);
+                    R = ele.val;
+                    val = (va-vb)/R;
+                case 'V'
+                    if ~isKey(this.Vsrc,s)
+                        es = sprintf('No such voltage source exists: %s',s);
+                        logger.error(fname,es);
+                        val = -1;
+                        return;
+                    end
+                    ele = this.Vsrc(s);
+                    n = ele.id;
+                    val = this.DC(this.G.m+n,end);
+                otherwise
+                    es = sprintf('Element type unknown: %s',type);
+                    logger.error(fname,es);
+                    val = -1;
+                    return;
             end
         end
     end

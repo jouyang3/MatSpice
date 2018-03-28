@@ -1,7 +1,9 @@
-classdef (Abstract) element
+classdef (Abstract) element < handle
     
     properties
         line
+        id
+        name
         pins
         val
     end
@@ -11,11 +13,14 @@ classdef (Abstract) element
             %ELEMENT Construct an instance of this class
             %   Detailed explanation goes here
             obj.line = line;
+            obj.name = -1;
+            obj.pins = [];
+            obj.val = -1;
         end
     end
     
     methods (Abstract)
-        attach(this,cir)
+        attach(this,cir,id)
     end
 end
 

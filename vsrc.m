@@ -5,7 +5,7 @@ classdef vsrc < element
             obj@element(line)
         end
         
-        function attach(this,cir)
+        function attach(this,cir,id)
             fname = 'V.attach';
             global logger
             % logger.info(fname,this.line);
@@ -24,14 +24,23 @@ classdef vsrc < element
                 logger.info(fname,tok);
             end
             
-            a = int8(str2num(args{2}));
-            b = int8(str2num(args{3}));
-            V = str2num(args{5});
+            as = args{2};
+            bs = args{3};
             
-            cir.Ele(args{1}) = [a, b];
+            a = cir.nodes.get(as);    
+            b = cir.nodes.get(bs);
+            V = str2num(args{5});
+
+            logger.info(fname,V);
+            
+            this.name = args{1};
             this.pins = [a, b];
             this.val = V;
-            cir.Vsrc = [cir.Vsrc this];
+            this.id = id;
+            
+            % Currently, map does not pass by reference...
+            cir.Vsrc(this.name) = this;
+
             % every volt increase in voltage source increase current flowing out of
             % node a by 1A (a is the + of voltage source).
             

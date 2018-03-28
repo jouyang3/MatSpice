@@ -1,7 +1,7 @@
 This is a netlist		$must have a title line
 
-r1	1	2	1000	$resistor connecting node 1 and 2
-r2  2   3   1000 $resistor
-r3  2   0   250
-v1  1   0   dc  6   $voltage source
+r1	in	out	1000	$resistor connecting node 1 and 2
+r2  out   3   500 $resistor
+r3  out   0   250
+v1  in   0   dc  6   $voltage source
 .end				$Must have an end
