@@ -147,6 +147,18 @@ classdef circuit < handle
                     vb = this.vdc(ele.pins(2),0);
                     R = ele.val;
                     val = (va-vb)/R;
+                    case 'C'
+                    if ~isKey(this.Cap,s)
+                        es = sprintf('No such capacitor exists: %s',s);
+                        logger.error(fname,es);
+                        val = -1;
+                        return;
+                    end
+                    ele = this.Cap(s);
+                    va = this.vdc(ele.pins(1),0);
+                    vb = this.vdc(ele.pins(2),0);
+                    C = ele.val;
+                    val = (va-vb)*C/ele.tau;
                 case 'V'
                     if ~isKey(this.Vsrc,s)
                         es = sprintf('No such voltage source exists: %s',s);

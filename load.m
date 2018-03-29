@@ -35,6 +35,8 @@ function cir = load(filename)
                 cir.register(res(line),rid);
             case 'C' % Capacitor
                 logger.info(fname,'Capacitor');
+                cid = cid+1;
+                cir.register(cap(line),cid);
             case 'L' % Inductor
                 logger.info(fname,'Inductor');
             case 'I' % Current Source

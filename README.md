@@ -1,8 +1,8 @@
 # MatSpice
 SPICE for Matlab
 
-
-## Simple resistive divider. Netlist File: rvCir.cir
+## DC Simulations
+### Simple resistive divider. Netlist File: rvCir.cir
 ```spice
 This is a netlist		$must have a title line
 
@@ -102,7 +102,7 @@ ans =
          0         0         0    1.0000   -0.0048
 ```
 
-## Circuit with current source. Netlist File: rviCir.cir
+### Circuit with current source. Netlist File: rviCir.cir
 ```spice
 This is a netlist		$must have a title line
 
@@ -205,4 +205,112 @@ ir3 =
 iv1 =
 
    -0.0050
+```
+
+### Simple RC circuit. Netlist File: rc.cir
+```spice
+This is a netlist		$must have a title line
+
+r1	1	2	1000	$resistor connecting node 1 and 2
+r2  2   0   500 $resistor
+c1  2   3   300e-15 $capacitor
+c2  3   0   200e-15
+v1  1   0   dc  5   $voltage source
+.end				$Must have an end
+```
+
+```matlab
+
+clear;
+spice_begin
+     global logger
+%     logger.setLogLevel(log4m.INFO);
+%     logger.setCommandWindowLevel(logger.INFO);
+    cir = load('rc.cir');
+    dc(cir);
+spice_end
+
+voutin = cir.vdc(1,0)
+
+vout3 = cir.vdc(2,0)
+
+vout = cir.vdc(3,0)
+
+% charge flowing into the voltage source from a to b.
+iv1 = cir.idc('v1')
+
+% charge flowing into R1 from a to b (node OUT to ground).
+ir1 = cir.idc('R1')
+
+% charge flowing into R2 from a to b (node OUT to ground).
+ir2 = cir.idc('r2')
+
+% charge flowing into C1 from a to b (node OUT to ground).
+ic1 = cir.idc('c1')
+
+% charge flowing into C2 from a to b (node OUT to ground).
+ic2 = cir.idc('c2')
+
+% MNA matrix
+cir.A
+
+% DC solution
+cir.DC
+```
+
+```matlab
+voutin =
+
+     5
+
+
+vout3 =
+
+    1.6667
+
+
+vout =
+
+    1.0000
+
+
+iv1 =
+
+   -0.0033
+
+
+ir1 =
+
+    0.0033
+
+
+ir2 =
+
+    0.0033
+
+
+ic1 =
+
+   2.0000e-19
+
+
+ic2 =
+
+   2.0000e-19
+
+
+ans =
+
+    0.0010   -0.0010         0    1.0000         0
+   -0.0010    0.0030   -0.0000         0         0
+         0   -0.0000    0.0000         0         0
+    1.0000         0         0         0    5.0000
+
+
+ans =
+
+    1.0000         0         0         0    5.0000
+         0    1.0000         0         0    1.6667
+         0         0    1.0000         0    1.0000
+         0         0         0    1.0000   -0.0033
 ```
