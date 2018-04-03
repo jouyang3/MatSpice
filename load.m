@@ -39,6 +39,8 @@ function cir = load(filename)
                 cir.register(cap(line),cid);
             case 'L' % Inductor
                 logger.info(fname,'Inductor');
+                lid = lid + 1;
+                cir.register(ind(line),lid);
             case 'I' % Current Source
                 logger.info(fname,'Current Source');
                 cir.register(isrc(line),vid);
@@ -54,9 +56,9 @@ function cir = load(filename)
     cir.conform();
     
     % assume no dependent sources yet.
-    cir.D = mat; cir.D.set(cir.C.m,cir.B.n,0);
+    cir.D = mat; cir.D.set(cir.C.m+cir.L.n,cir.L.n+cir.B.n,0);
     
-    cir.A = [cir.G.A cir.B.A cir.I.A; cir.C.A, cir.D.A cir.V.A];
+    cir.A = [cir.G.A cir.L.A cir.B.A cir.I.A; [cir.L.A'; cir.C.A] cir.D.A [cir.VL.A; cir.V.A]];
     
     fclose(fid);
 end

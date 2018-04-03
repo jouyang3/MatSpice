@@ -4,6 +4,7 @@ classdef circuit < handle
         A = []; % Modified nodal analysis matrix
         DC = []; % DC result matrix
         G = mat; % passive elements
+        L = mat; % inductor elements
         B = mat; % independent voltage elements
         
         % definition of C and D subject to change for dependent voltage
@@ -13,6 +14,7 @@ classdef circuit < handle
         
         I = mat; % KCL constraint.
         V = mat; % KVL constraint.
+        VL = mat; % KVL constrant for inductors.
         
         Vsrc = containers.Map('KeyType','char','ValueType','any'); % Containers for voltage sources
         Isrc = containers.Map('KeyType','char','ValueType','any'); % Containers for current sources
@@ -29,6 +31,7 @@ classdef circuit < handle
             obj.A = []; % Modified nodal analysis matrix
             obj.DC = []; % DC result matrix
             obj.G = mat; % passive elements
+            L = mat; % inductor elements
             obj.B = mat; % independent voltage elements
             
             % definition of C and D subject to change for dependent voltage
@@ -38,6 +41,8 @@ classdef circuit < handle
             
             obj.I = mat; % KCL constraint vector.
             obj.V = mat; % KVL constraint vector.
+            
+            obj.VL = mat; % KVL constrant for inductors.
             
             Vsrc = containers.Map('KeyType','char','ValueType','any'); % Containers for voltage sources
             Isrc = containers.Map('KeyType','char','ValueType','any'); % Containers for current sources
@@ -56,6 +61,12 @@ classdef circuit < handle
                 this.B.A(this.B.m+1:this.G.m,ii) = 0;
             end
             this.B.m = this.G.m;
+            
+            for ii=1:this.L.n
+                this.L.A(this.L.m+1:this.G.m,ii) = 0;
+            end
+            this.L.m = this.G.m;
+            
             for ii=1:this.C.m
                 this.C.A(ii,this.C.n+1:this.G.n) = 0;
             end
@@ -159,6 +170,15 @@ classdef circuit < handle
                     vb = this.vdc(ele.pins(2),0);
                     C = ele.val;
                     val = (va-vb)*C/ele.tau;
+                case 'L'
+                    if ~isKey(this.Ind,s)
+                        es = sprintf('No such inductor exists: %s',s);
+                        logger.error(fname,es);
+                        val = -1;
+                        return;
+                    end
+                    ele = this.Ind(s);
+                    val = this.DC(this.G.m+ele.id,end);
                 case 'V'
                     if ~isKey(this.Vsrc,s)
                         es = sprintf('No such voltage source exists: %s',s);
@@ -167,8 +187,8 @@ classdef circuit < handle
                         return;
                     end
                     ele = this.Vsrc(s);
-                    n = ele.id;
-                    val = this.DC(this.G.m+n,end);
+                    m = ele.id;
+                    val = this.DC(this.G.m+this.L.n+m,end);
                 case 'I'
                     if ~isKey(this.Isrc,s)
                         es = sprintf('No such current source exists: %s',s);

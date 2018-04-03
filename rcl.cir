@@ -1,0 +1,10 @@
+This is a netlist		$must have a title line
+
+r1	1	2	1000	$resistor connecting node 1 and 2
+r2  2   0   500 $resistor
+l1  2   3   3e-9 $inductor
+c1  3   0   300e-15 $capacitor 
+l2  3   4   5e-9 $inductor
+c2  4   0   200e-15
+v1  1   0   dc  5   $voltage source
+.end				$Must have an end
